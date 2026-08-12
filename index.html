@@ -932,12 +932,10 @@
   async function handleOrder() {
     const email = document.querySelector('input[type="email"]').value.trim();
     const petName = document.querySelector('input[type="text"]').value.trim();
-    const format = document.querySelector('select').value;
-    const selectedStyle = document.querySelector('.style-option.selected span:last-child')?.textContent?.toLowerCase().replace(' ', '') || 'watercolor';
+    const formatKey = document.querySelector('select').value || 'digital';
+    const selectedStyle = document.querySelector('.style-option.selected span:last-child')?.textContent?.toLowerCase().replace(/\s+/g, '') || 'watercolor';
     const styleMap = { 'watercolor': 'watercolor', 'oilpainting': 'oil', 'royal': 'royal', 'cartoon': 'cartoon', 'pencilsketch': 'sketch', 'popart': 'popart', 'ancientgreek': 'ancient', 'fantasy': 'fantasy' };
     const style = styleMap[selectedStyle] || 'watercolor';
-    const formatMap = { 'Digital download — $35': 'digital', 'Printed 8×10 — $65': 'printed', 'Framed 8×10 — $125': 'framed', 'Canvas 16×20 — $110': 'canvas' };
-    const formatKey = formatMap[format] || 'digital';
 
     if (!email) return alert('Please enter your email address.');
     if (!uploadedPhotoUrl) return alert('Please upload a photo of your pet first.');
