@@ -904,18 +904,64 @@
   }
 
   function handleUpload(input) {
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('previewImg').src = e.target.result;
-        document.getElementById('uploadPreview').style.display = 'block';
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
+    handlePhotoUpload(input);
   }
 
-  function handleOrder() {
-    alert('Payment integration coming soon! Your order has been noted.');
+  const BACKEND_URL = 'https://furamous-backend.onrender.com';
+  let uploadedPhotoUrl = null;
+
+  async function handlePhotoUpload(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('photo', file);
+    try {
+      const res = await fetch(`${BACKEND_URL}/upload/photo`, { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        uploadedPhotoUrl = data.url;
+        document.getElementById('previewImg').src = data.url;
+        document.getElementById('uploadPreview').style.display = 'block';
+      }
+    } catch (err) { alert('Photo upload failed. Please try again.'); }
+  }
+
+  async function handleOrder() {
+    const email = document.querySelector('input[type="email"]').value.trim();
+    const petName = document.querySelector('input[type="text"]').value.trim();
+    const format = document.querySelector('select').value;
+    const selectedStyle = document.querySelector('.style-option.selected span:last-child')?.textContent?.toLowerCase().replace(' ', '') || 'watercolor';
+    const styleMap = { 'watercolor': 'watercolor', 'oilpainting': 'oil', 'royal': 'royal', 'cartoon': 'cartoon', 'pencilsketch': 'sketch', 'popart': 'popart', 'ancientgreek': 'ancient', 'fantasy': 'fantasy' };
+    const style = styleMap[selectedStyle] || 'watercolor';
+    const formatMap = { 'Digital download — $35': 'digital', 'Printed 8×10 — $65': 'printed', 'Framed 8×10 — $125': 'framed', 'Canvas 16×20 — $110': 'canvas' };
+    const formatKey = formatMap[format] || 'digital';
+
+    if (!email) return alert('Please enter your email address.');
+    if (!uploadedPhotoUrl) return alert('Please upload a photo of your pet first.');
+
+    const btn = document.querySelector('.modal button.btn-primary');
+    btn.textContent = 'Processing...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/checkout/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, petName, style, format: formatKey, petPhotoUrl: uploadedPhotoUrl })
+      });
+      const data = await res.json();
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      } else {
+        alert('Something went wrong. Please try again.');
+        btn.textContent = 'Continue to payment →';
+        btn.disabled = false;
+      }
+    } catch (err) {
+      alert('Connection error. Please try again.');
+      btn.textContent = 'Continue to payment →';
+      btn.disabled = false;
+    }
   }
 
   document.querySelectorAll('a[href^="#"]').forEach(a => {

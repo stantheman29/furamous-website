@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Furamous</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: #FAF7F2; color: #1A1714; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card { background: white; border-radius: 24px; padding: 64px 48px; max-width: 560px; width: 100%; text-align: center; border: 1px solid rgba(0,0,0,0.08); }
+  .icon { font-size: 64px; margin-bottom: 24px; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; margin-bottom: 16px; color: #1A1714; }
+  p { font-size: 16px; color: #6B6459; line-height: 1.7; margin-bottom: 12px; }
+  .status { display: inline-flex; align-items: center; gap: 8px; background: #FFF8EC; border: 1px solid #E8C97A; border-radius: 100px; padding: 8px 20px; font-size: 14px; font-weight: 600; color: #8B6520; margin: 24px 0; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #C9963A; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+  .btn { display: inline-block; background: #C9963A; color: white; padding: 14px 32px; border-radius: 100px; text-decoration: none; font-size: 15px; font-weight: 600; margin-top: 24px; }
+  .order-id { font-size: 12px; color: #9CA3AF; margin-top: 24px; font-family: monospace; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🎨</div>
+  <h1>Order confirmed!</h1>
+  <p>Thank you for your order. Your pet portrait is being created right now.</p>
+  <div class="status">
+    <div class="status-dot"></div>
+    Generating your portrait...
+  </div>
+  <p>You'll receive an email with your portrait and download link within <strong>24 hours</strong>. Check your inbox — and your spam folder just in case.</p>
+  <p style="font-size:14px; margin-top:16px;">Questions? <a href="mailto:furamouspet@gmail.com" style="color:#C9963A;">furamouspet@gmail.com</a></p>
+  <a href="https://furamous.com" class="btn">Back to Furamous</a>
+  <div class="order-id" id="orderId"></div>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  if (sessionId) {
+    document.getElementById('orderId').textContent = `Order ref: ${sessionId.slice(-12)}`;
+    // Poll order status
+    async function checkStatus() {
+      try {
+        const res = await fetch(`https://furamous-backend.onrender.com/order/${sessionId}`);
+        const data = await res.json();
+        if (data.success) {
+          const status = data.order.status;
+          const statusEl = document.querySelector('.status');
+          if (status === 'delivered') {
+            statusEl.innerHTML = '✅ Portrait delivered — check your email!';
+            statusEl.style.background = '#F0FFF4';
+            statusEl.style.borderColor = '#6EE7B7';
+            statusEl.style.color = '#065F46';
+          }
+        }
+      } catch(err) {}
+    }
+    checkStatus();
+    setInterval(checkStatus, 10000); // Check every 10 seconds
+  }
+</script>
+</body>
+</html>
