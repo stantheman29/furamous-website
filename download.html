@@ -31,7 +31,9 @@
 
 <script>
   const BACKEND_URL = 'https://furamous-backend.onrender.com';
-  const token = window.location.pathname.split('/download/')[1];
+  const pathToken = window.location.pathname.split('/download/')[1];
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = pathToken || urlParams.get('token');
 
   async function loadPortrait() {
     if (!token) {

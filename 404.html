@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+  // Redirect /download/TOKEN to download.html
+  const path = window.location.pathname;
+  if (path.startsWith('/download/')) {
+    const token = path.split('/download/')[1];
+    window.location.href = '/furamous-website/download.html?token=' + token;
+  } else {
+    window.location.href = '/furamous-website/';
+  }
+</script>
+</head>
+<body></body>
+</html>
