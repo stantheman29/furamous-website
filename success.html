@@ -51,6 +51,18 @@
             statusEl.style.background = '#F0FFF4';
             statusEl.style.borderColor = '#6EE7B7';
             statusEl.style.color = '#065F46';
+          } else if (status === 'printing') {
+            statusEl.innerHTML = '🖨️ Portrait generated — being sent to print!';
+            statusEl.style.background = '#F0FFF4';
+            statusEl.style.borderColor = '#6EE7B7';
+            statusEl.style.color = '#065F46';
+          } else if (status === 'generated') {
+            statusEl.innerHTML = '🎨 Portrait generated — sending your email now...';
+          } else if (status === 'failed') {
+            statusEl.innerHTML = '❌ Something went wrong — we will contact you shortly.';
+            statusEl.style.background = '#FFF0F0';
+            statusEl.style.borderColor = '#FCA5A5';
+            statusEl.style.color = '#991B1B';
           }
         }
       } catch(err) {}
